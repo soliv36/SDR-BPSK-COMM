@@ -38,12 +38,11 @@ tx_rx.config_tx(sdr, sample_rate, center_freq, -40)
 #setup recieve
 tx_rx.config_rx(sdr, sample_rate, center_freq, num_samples, 'manual', 20.0)
 
+#get message to send, convert to ascii binary
 x_bits = input('Enter message: ')
 x_bits = str_to_binary_list(x_bits)
 
-
 x_bits = tx_rx.encode_bits(x_bits) #encode the message
-#x_bits = x_bits*2-1 #apply NRZ encoding
 x_bits = np.array(x_bits)
 x_degrees = x_bits*360/2.0
 x_radians = x_degrees*np.pi/180
@@ -57,8 +56,6 @@ samples *= 2**14 #scale samples for Pluto SDR
 
 #transmit and recieve the samples
 rx_samples = tx_rx.transmit_receive_cyclic(sdr, samples)
-
-#srx_samples = rx.rx(sdr)
 
 #save the samples to the file
 np.save('samples.npy', rx_samples)
