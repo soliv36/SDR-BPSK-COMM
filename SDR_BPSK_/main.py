@@ -2,7 +2,6 @@ import numpy as np
 import adi
 import tx_rx
 import matplotlib.pyplot as plt
-import rx
 
 def str_to_binary_list(text):
     index = 0
