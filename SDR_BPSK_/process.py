@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import rx
 
-#Detects whether there is a signal in received samples by how much of the PSD is above a given threshold
+#detect if the samples received by the SDR contain a signal
 def detect_signal(samples, threshold, percentage):
     fft = np.fft.fft(samples)
     fft = np.abs(samples)
@@ -15,88 +14,52 @@ def detect_signal(samples, threshold, percentage):
         return True
     else:
         return False
+    
+#calculate the PSD
+def psd(samples, sample_rate):
+    fft = np.fft.fft(samples)
+    fft_freq = np.fft.fftfreq(len(samples), 1/sample_rate)
+    psd = np.abs(fft)**2 / len(samples)
 
-#Puts all samples as either 1 or 0
+    return psd
+
+#make the samples either ones or zeros
 def correct_received_signal(rx_samples):
     corrected_samples = []
     for s in rx_samples:
         if s >= 1:
             corrected_samples.append(1)
         
-        if s <= -2:
+        if s <= -1:
             corrected_samples.append(0)
 
     return corrected_samples
 
-#finds the index of the start of the sent data
-def find_start_index(samples):
-    start_data = [1, 1, 1, 0, 0, 0, 1, 1, 1] #need 2 sets of 24*3 ones, 24*3 zeroes
-    index = 0
-    count = 0
-    start_data = False
-    prev_pattern = 'none'
-
-    while index < len(samples):
-        if samples[index] == 1:
-            while samples[index] == 1:
-                count = count + 1
-                index = index + 1
-
-            if count == 24*3:
-                if prev_pattern == 'zero':
-                    return index
-                elif prev_pattern == 'none':
-                    prev_pattern = 'one'
-
-                
-            count = 0
-        
-        else:
-            while samples[index] == 0:
-                index = index + 1
-                count = count + 1
-
-            if count == 24*3:
-                if prev_pattern == 'one':
-                    prev_pattern = 'zero'
-
-            count = 0
-
-#finds the end index of sent data
-def find_end_index(samples, start_index):
-    end_encoding = [1, 1, 1, 1, 0, 1, 1, 1, 1]
+#finds the index of the begining or the end of the data, is_start should equal True if looking for the start index, False otherwise
+def find_index(samples, start_index, is_start):
+    #start_stop_data = [1, 1, 1, 1, 1, 1, 1, 1]
     index = start_index
     count = 0
-    start_data = False
-    prev_pattern = 'none'
 
     while index < len(samples):
         if samples[index] == 1:
             while samples[index] == 1:
-                count = count + 1
-                index = index + 1
-
-            if count == 24*4:
-                if prev_pattern == 'zero':
-                    return index - 24 * 9
-                
-                elif prev_pattern == 'none':
-                    prev_pattern = 'one'
-
-            count = 0
-        
+                count += 1
+                index += 1
+            
+            if count >= 24*8:
+                print('Index: ', index)
+                if is_start == True:
+                    return index
+                else:
+                    return index - 24*16
+            else:
+                count = 0
         else:
             while samples[index] == 0:
-                index = index + 1
-                count = count + 1
+                index += 1
 
-            if count == 24:
-                if prev_pattern == 'one':
-                    prev_pattern = 'zero'
-
-            count = 0
-
-#converts the samples to ascii binary
+#convert the binary to ascii binary
 def samples_to_ascii(samples, start_index, end_index):
     index = start_index
     count = 0
@@ -114,7 +77,7 @@ def samples_to_ascii(samples, start_index, end_index):
                 index = index + 24
     return data
 
-#converts the ascii binary to text
+#convert the ascii to text
 def ascii_to_text(samples):
     remainder = len(samples) % 8
 
@@ -159,8 +122,9 @@ if is_signal == True:
     axs0[1].set_title('Corrected samples')
     plt.show()
 
-    start_index = find_start_index(corrected_samples)
-    end_index = find_end_index(corrected_samples, start_index)
+    start_index = find_index(corrected_samples, 0, True)
+    end_index = find_index(corrected_samples, start_index, False)
+    
 
     print('Start', start_index)
     print('end', end_index)
@@ -169,7 +133,5 @@ if is_signal == True:
     print(len(ascii))
 
     ascii_to_text(ascii)
-
-
     
 
