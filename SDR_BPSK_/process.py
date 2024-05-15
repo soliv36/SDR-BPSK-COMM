@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import rx
 
-
+#Detects whether there is a signal in received samples by how much of the PSD is above a given threshold
 def detect_signal(samples, threshold, percentage):
     fft = np.fft.fft(samples)
     fft = np.abs(samples)
@@ -16,11 +16,7 @@ def detect_signal(samples, threshold, percentage):
     else:
         return False
 
-def psd(samples, sample_rate):
-    fft_signal = np.fft.fft(samples)
-    psd_signal = np.abs(fft_signal) ** 2 / (sample_rate * len(samples))  # Scaling by sampling frequency and length
-    return psd_signal
-
+#Puts all samples as either 1 or 0
 def correct_received_signal(rx_samples):
     corrected_samples = []
     for s in rx_samples:
@@ -32,6 +28,7 @@ def correct_received_signal(rx_samples):
 
     return corrected_samples
 
+#finds the index of the start of the sent data
 def find_start_index(samples):
     start_data = [1, 1, 1, 0, 0, 0, 1, 1, 1] #need 2 sets of 24*3 ones, 24*3 zeroes
     index = 0
@@ -65,7 +62,7 @@ def find_start_index(samples):
 
             count = 0
 
-
+#finds the end index of sent data
 def find_end_index(samples, start_index):
     end_encoding = [1, 1, 1, 1, 0, 1, 1, 1, 1]
     index = start_index
@@ -99,7 +96,7 @@ def find_end_index(samples, start_index):
 
             count = 0
 
-
+#converts the samples to ascii binary
 def samples_to_ascii(samples, start_index, end_index):
     index = start_index
     count = 0
@@ -117,6 +114,7 @@ def samples_to_ascii(samples, start_index, end_index):
                 index = index + 24
     return data
 
+#converts the ascii binary to text
 def ascii_to_text(samples):
     remainder = len(samples) % 8
 
