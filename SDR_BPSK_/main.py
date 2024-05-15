@@ -38,19 +38,6 @@ tx_rx.config_tx(sdr, sample_rate, center_freq, -40)
 #setup recieve
 tx_rx.config_rx(sdr, sample_rate, center_freq, num_samples, 'manual', 20.0)
 
-
-"""
-#create transmit waveform
-x_bits = [
-    0, 1, 0, 0, 0, 0, 1, 1,
-    0, 1, 0, 0, 1, 1, 1, 1,
-    0, 1, 0, 1, 0, 0, 1, 1,
-    0, 1, 0, 0, 1, 1, 0, 1,
-    0, 1, 0, 0, 1, 0, 0, 1,
-    0, 1, 0, 0, 0, 0, 0, 1,
-    0, 1, 0, 0, 0, 0, 1, 1,
-]
-"""
 x_bits = input('Enter message: ')
 x_bits = str_to_binary_list(x_bits)
 
