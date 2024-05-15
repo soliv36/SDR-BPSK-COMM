@@ -2,11 +2,13 @@ import adi
 from rtlsdr import RtlSdr
 import numpy as np
 
+#configure the Pluto SDR to transmit samples
 def config_tx_pluto(sdr, sample_rate, center_freq, tx_hardwaregain_chan0):
     sdr.tx_rf_bandwidth = int(sample_rate)
     sdr.tx_lo = int(center_freq)
     sdr.tx_hardwaregain_chan0 = int(tx_hardwaregain_chan0)
 
+#convert the string to binary 
 def str_to_binary_list(text):
     index = 0
     text = str(text)
@@ -28,14 +30,14 @@ def str_to_binary_list(text):
 
     return bits
 
+#add a sequence of bits before and after the data
 def encode_bits(bits):
     start_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1]
     end_data =   [1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     encoded = start_data + bits + end_data
     return encoded
-    
 
-
+#frame the data, convert it to BPSK samples, and transmit
 def send_message(sdr, x_bits, sample_rate):
     x_bits = encode_bits(x_bits) #encode the message
     x_bits = np.array(x_bits)
