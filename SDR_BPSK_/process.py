@@ -48,7 +48,6 @@ def find_index(samples, start_index, is_start):
                 index += 1
             
             if count >= 24*8:
-                print('Index: ', index)
                 if is_start == True:
                     return index
                 else:
@@ -124,14 +123,11 @@ if is_signal == True:
 
     start_index = find_index(corrected_samples, 0, True)
     end_index = find_index(corrected_samples, start_index, False)
-    
 
     print('Start', start_index)
     print('end', end_index)
 
     ascii = samples_to_ascii(corrected_samples, start_index, end_index)
-    print(len(ascii))
 
     ascii_to_text(ascii)
-    
 
