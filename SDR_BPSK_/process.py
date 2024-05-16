@@ -35,6 +35,37 @@ def correct_received_signal(rx_samples):
 
     return corrected_samples
 
+def synchronize(samples):
+    new_samples = []
+    index = 0
+    count = 0
+
+    while index <= len(samples):
+        if samples[index] == 1:
+            while samples[index] == 1:
+                index += 1
+                count += 1
+            
+            if count >= 24*8:
+                return samples
+            else:
+                count = 0
+        else:
+            while samples[index] == 0:
+                index += 1
+                count += 1
+            
+            if count >= 24*8:
+                for sample in samples:
+                    if sample == 1:
+                        new_samples.append(0)
+                    else:
+                        new_samples.append(1)
+                return new_samples
+            
+            else:
+                count = 0
+
 #finds the index of the begining or the end of the data, is_start should equal True if looking for the start index, False otherwise
 def find_index(samples, start_index, is_start):
     #start_stop_data = [1, 1, 1, 1, 1, 1, 1, 1]
@@ -111,6 +142,7 @@ plt.show()
 
 if is_signal == True:
     corrected_samples = correct_received_signal(rx_samples)
+    corrected_samples = synchronize(corrected_samples)
 
     fig0, axs0 = plt.subplots(2)
 
@@ -130,4 +162,3 @@ if is_signal == True:
     ascii = samples_to_ascii(corrected_samples, start_index, end_index)
 
     ascii_to_text(ascii)
-
