@@ -1,1 +1,1 @@
-A (attempt) communication system for the Adalm-Pluto SDR. 
+A (attempted) communication system for the Adalm-Pluto SDR. 
