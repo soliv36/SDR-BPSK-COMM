@@ -68,20 +68,22 @@ def correct_samples(samples):
     
     return corrected_samples
 
+#check if the signal received contains the stop tx bits sent by receive side
 def has_stop_bits(samples):
     #start_stop_bits = [0, 0, 0, 0, 1, 1, 1, 1]
     index = 0
     count_ones = 0
     count_zeros = 0
+    error_tolerance = 3
 
     while index <= len(samples)/4:
         if samples[index] == 1:
             while samples[index] == 1 and index <= len(samples)/4:
                 count_ones += 1
                 index += 1
-            if count_ones == 24*4 and count_zeros == 24*4:
+            if (24*4-error_tolerance <= count_ones <= 24*4+error_tolerance) and (24*4-error_tolerance <= count_zeros <= 24*4+error_tolerance):
                 return True
-            elif count_ones < 24*4 or count_ones > 24*4:
+            elif count_ones < 24*4-error_tolerance or count_ones > 24*4+error_tolerance:
                 count_ones = 0
                 count_zeros = 0
             else:
@@ -90,9 +92,9 @@ def has_stop_bits(samples):
             while samples[index] == 0 and index <= len(samples)/4:
                 count_zeros += 1
                 index += 1
-            if count_zeros == 24*4 and count_ones == 24*4:
+            if (24*4-error_tolerance <= count_zeros <= 24*4+error_tolerance) and (24*4-error_tolerance <= count_ones <= 24*4+error_tolerance):
                 return True
-            elif count_zeros < 24*4 or count_zeros > 24*4:
+            elif count_zeros < 24*4-error_tolerance or count_zeros > 24*4+error_tolerance:
                 count_zeros = 0
                 count_ones = 0
             else:
